@@ -10,41 +10,18 @@
   text-align: center;
   max-width: 550px;
   width: 100%;
-  background: 
-    linear-gradient(135deg, rgba(248, 250, 252, 0.03) 0%, rgba(120, 119, 198, 0.02) 100%);
-  backdrop-filter: blur(20px);
-  border-radius: 32px;
-  padding: 4rem 3rem;
-  box-shadow: 
-    0 20px 40px rgba(120, 119, 198, 0.1),
-    0 8px 16px rgba(255, 119, 198, 0.05);
-  border: 1px solid rgba(120, 119, 198, 0.15);
-  position: relative;
-  overflow: hidden;
+  background: rgba(248, 250, 252, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(120, 119, 198, 0.2);
 }
 
-.analysis-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 30% 40%, rgba(120, 119, 198, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 70% 60%, rgba(255, 119, 198, 0.02) 0%, transparent 50%);
-  animation: shimmer 3s infinite;
-}
 
 .analysis-title {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: rgba(248, 250, 252, 0.9);
-  margin-bottom: 2.5rem;
-  font-family: 'Inter', sans-serif;
-  position: relative;
-  z-index: 1;
-  letter-spacing: -0.01em;
+  margin-bottom: 1.5rem;
 }
 
 .progress-container {
@@ -55,20 +32,17 @@
 
 .progress-bar {
   width: 100%;
-  height: 8px;
-  background: rgba(120, 119, 198, 0.15);
-  border-radius: 20px;
-  overflow: hidden;
+  height: 6px;
+  background: rgba(120, 119, 198, 0.2);
+  border-radius: 3px;
   margin-bottom: 0.8rem;
-  backdrop-filter: blur(10px);
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #7877c6, #ff77c6, #a855f7);
-  border-radius: 20px;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: progressGlow 2s infinite alternate;
+  background: #7877c6;
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 
 .progress-text {
@@ -101,30 +75,29 @@
 }
 
 .circle {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  animation: bounce 1.6s infinite ease-in-out both;
-  backdrop-filter: blur(10px);
+  animation: bounce 1.2s infinite ease-in-out both;
 }
 
 .circle-1 {
-  background: linear-gradient(135deg, #7877c6, #9d8df1);
+  background: #7877c6;
   animation-delay: -0.32s;
 }
 
 .circle-2 {
-  background: linear-gradient(135deg, #ff77c6, #ff9fd6);
+  background: #ff77c6;
   animation-delay: -0.16s;
 }
 
 .circle-3 {
-  background: linear-gradient(135deg, #a855f7, #c084fc);
+  background: #a855f7;
   animation-delay: 0;
 }
 
 .circle-4 {
-  background: linear-gradient(135deg, #7877c6, #ff77c6);
+  background: #7877c6;
   animation-delay: 0.16s;
 }
 
@@ -136,27 +109,6 @@
   40% {
     transform: scale(1.1);
     opacity: 1;
-  }
-}
-
-@keyframes progressGlow {
-  0% {
-    box-shadow: 0 0 8px rgba(120, 119, 198, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 16px rgba(255, 119, 198, 0.4);
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 0.3;
   }
 }
 

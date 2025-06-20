@@ -11,30 +11,12 @@
 }
 
 .results-content {
-  background: 
-    linear-gradient(135deg, rgba(248, 250, 252, 0.03) 0%, rgba(120, 119, 198, 0.02) 100%);
-  backdrop-filter: blur(20px);
-  border-radius: 32px;
-  padding: 3rem;
-  box-shadow: 
-    0 20px 40px rgba(120, 119, 198, 0.1),
-    0 8px 16px rgba(255, 119, 198, 0.05);
-  border: 1px solid rgba(120, 119, 198, 0.15);
-  position: relative;
-  overflow: hidden;
+  background: rgba(248, 250, 252, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+  border: 1px solid rgba(120, 119, 198, 0.2);
 }
 
-.results-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #7877c6, #ff77c6, #a855f7, #7877c6);
-  background-size: 200% 100%;
-  animation: rainbowFlow 4s linear infinite;
-}
 
 .results-header {
   text-align: center;
@@ -42,28 +24,25 @@
 }
 
 .results-title {
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #2d1b69;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.9);
   margin-bottom: 0.5rem;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
-  text-shadow: 2px 2px 4px rgba(255, 107, 157, 0.3);
 }
 
 .results-subtitle {
-  font-size: 1.1rem;
-  color: #7b68ee;
-  font-weight: 600;
+  font-size: 1rem;
+  color: rgba(248, 250, 252, 0.7);
+  font-weight: 400;
   margin: 0;
 }
 
 .section-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #ff6b35;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.9);
   margin-bottom: 1rem;
   text-align: center;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
 }
 
 .mood-section, .season-section {
@@ -71,20 +50,18 @@
 }
 
 .mood-card, .season-card {
-  background: linear-gradient(135deg, #ffe4f1 0%, #e8f4fd 100%);
-  border-radius: 20px;
+  background: rgba(248, 250, 252, 0.1);
+  border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
-  border: 2px solid #ff8fab;
-  box-shadow: 0 8px 20px rgba(255, 107, 157, 0.15);
+  border: 1px solid rgba(120, 119, 198, 0.3);
 }
 
 .mood-text, .season-text {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #2d1b69;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.9);
   margin: 0;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
 }
 
 .colors-section {
@@ -105,16 +82,15 @@
 }
 
 .color-swatch {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
+  border: 2px solid white;
+  transition: transform 0.2s ease;
 }
 
 .color-swatch:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .color-code {
@@ -189,7 +165,6 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 6px 15px rgba(255, 107, 157, 0.3);
-  font-family: 'Comic Sans MS', cursive, sans-serif;
 }
 
 .copy-button {
@@ -227,27 +202,24 @@
 }
 
 .personal-color-card {
-  background: linear-gradient(135deg, #f8f4ff 0%, #fff0f8 100%);
-  border-radius: 20px;
-  padding: 2rem;
+  background: rgba(248, 250, 252, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
   text-align: center;
-  border: 2px solid #c9a9ff;
-  box-shadow: 0 8px 20px rgba(201, 169, 255, 0.2);
+  border: 1px solid rgba(120, 119, 198, 0.3);
 }
 
 .personal-season-name {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: #6b46c1;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.9);
   margin-bottom: 1rem;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
-  text-shadow: 1px 1px 2px rgba(107, 70, 193, 0.2);
 }
 
 .personal-description {
-  font-size: 1.1rem;
-  color: #5b21b6;
-  font-weight: 600;
+  font-size: 1rem;
+  color: rgba(248, 250, 252, 0.8);
+  font-weight: 400;
   margin-bottom: 1.5rem;
   line-height: 1.6;
 }
@@ -345,14 +317,6 @@
   z-index: 0;
 }
 
-@keyframes rainbowFlow {
-  0% {
-    background-position: 0% 0%;
-  }
-  100% {
-    background-position: 200% 0%;
-  }
-}
 
 @media (max-width: 768px) {
   .results {
