@@ -60,65 +60,85 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onImageUpload }) => {
   const startCamera = async () => {
     // Check if we're in a secure context
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Camera not supported or not in secure context (HTTPS required)! 🔒');
+      alert('Camera not supported or HTTPS required!');
       return;
     }
 
-    console.log('Starting camera...');
-    console.log('Secure context:', window?.isSecureContext);
-    console.log('Location protocol:', window?.location?.protocol);
-
     try {
-      // Try with back camera first
+      // First, try to get list of devices
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      
+      if (videoDevices.length === 0) {
+        alert('No camera found on your device!');
+        return;
+      }
+
+      // Try with simpler constraints first
       let mediaStream;
       try {
-        console.log('Trying back camera...');
+        // Try back camera first (mobile)
         mediaStream = await navigator.mediaDevices.getUserMedia({
           video: { 
-            facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280, max: 1920 },
+            height: { ideal: 720, max: 1080 }
           }
         });
-        console.log('Back camera success');
       } catch (backCameraError) {
-        // If back camera fails, try with any available camera
-        console.log('Back camera not available, trying any camera:', backCameraError);
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        });
-        console.log('Any camera success');
+        try {
+          // Try front camera
+          mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: { 
+              facingMode: { ideal: 'user' },
+              width: { ideal: 1280, max: 1920 },
+              height: { ideal: 720, max: 1080 }
+            }
+          });
+        } catch (frontCameraError) {
+          // Try any camera with basic constraints
+          mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: true
+          });
+        }
       }
       
-      console.log('Media stream obtained:', mediaStream);
       setStream(mediaStream);
       setShowCamera(true);
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        console.log('Video srcObject set');
-        // Ensure video plays
-        videoRef.current.play().catch(e => console.log('Video play error:', e));
+        // Wait for video to be ready
+        await new Promise((resolve) => {
+          if (videoRef.current) {
+            videoRef.current.onloadedmetadata = () => resolve(true);
+          }
+        });
+        await videoRef.current.play();
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
-      let errorMessage = 'Unable to access camera. ';
+      let errorMessage = 'Camera access failed. ';
       
       if (error instanceof Error) {
-        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-          errorMessage += 'Please allow camera permissions! 📷';
-        } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-          errorMessage += 'No camera found on your device! 📷';
-        } else if (error.name === 'NotSupportedError') {
-          errorMessage += 'Camera not supported! Try HTTPS! 🔒';
-        } else {
-          errorMessage += 'Please check camera permissions and try again! 📷';
+        switch (error.name) {
+          case 'NotAllowedError':
+          case 'PermissionDeniedError':
+            errorMessage += 'Please allow camera permissions in your browser settings.';
+            break;
+          case 'NotFoundError':
+          case 'DevicesNotFoundError':
+            errorMessage += 'No camera found on your device.';
+            break;
+          case 'NotSupportedError':
+            errorMessage += 'Camera not supported. Make sure you\'re using HTTPS.';
+            break;
+          case 'NotReadableError':
+            errorMessage += 'Camera is being used by another application.';
+            break;
+          default:
+            errorMessage += 'Please check your camera permissions and try again.';
         }
-      } else {
-        errorMessage += 'Please check camera permissions and try again! 📷';
       }
       
       alert(errorMessage);
