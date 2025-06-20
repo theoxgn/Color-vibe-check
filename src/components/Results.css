@@ -1,0 +1,405 @@
+.results {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.results-content {
+  background: linear-gradient(135deg, #fff5f8 0%, #f0f8ff 100%);
+  border-radius: 25px;
+  padding: 2rem;
+  box-shadow: 0 15px 35px rgba(255, 107, 157, 0.2);
+  border: 3px solid #ff6b9d;
+  position: relative;
+  overflow: hidden;
+}
+
+.results-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: linear-gradient(90deg, #ff6b9d, #7b68ee, #4ecdc4, #ffd700, #ff6b9d);
+  background-size: 200% 100%;
+  animation: rainbowFlow 3s linear infinite;
+}
+
+.results-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.results-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #2d1b69;
+  margin-bottom: 0.5rem;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  text-shadow: 2px 2px 4px rgba(255, 107, 157, 0.3);
+}
+
+.results-subtitle {
+  font-size: 1.1rem;
+  color: #7b68ee;
+  font-weight: 600;
+  margin: 0;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #ff6b35;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.mood-section, .season-section {
+  margin-bottom: 2rem;
+}
+
+.mood-card, .season-card {
+  background: linear-gradient(135deg, #ffe4f1 0%, #e8f4fd 100%);
+  border-radius: 20px;
+  padding: 1.5rem;
+  text-align: center;
+  border: 2px solid #ff8fab;
+  box-shadow: 0 8px 20px rgba(255, 107, 157, 0.15);
+}
+
+.mood-text, .season-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2d1b69;
+  margin: 0;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.colors-section {
+  margin-bottom: 2rem;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.color-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.color-swatch {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.color-code {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5d4e75;
+  text-transform: uppercase;
+}
+
+.palette-section {
+  margin-bottom: 2rem;
+}
+
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0.5rem;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.palette-swatch {
+  aspect-ratio: 1;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.palette-swatch:hover {
+  transform: scale(1.05);
+  z-index: 1;
+}
+
+.inspiration-section {
+  text-align: center;
+}
+
+.inspiration-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.inspo-tag {
+  background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: lowercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(255, 107, 157, 0.3);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.share-button, .copy-button, .reset-button {
+  background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(255, 107, 157, 0.3);
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.copy-button {
+  background: linear-gradient(135deg, #7b68ee, #9575f0);
+  box-shadow: 0 6px 15px rgba(123, 104, 238, 0.3);
+}
+
+.reset-button {
+  background: linear-gradient(135deg, #4ecdc4, #6ee8e0);
+  box-shadow: 0 6px 15px rgba(78, 205, 196, 0.3);
+}
+
+.share-button:hover, .copy-button:hover, .reset-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.share-button:active, .copy-button:active, .reset-button:active {
+  transform: translateY(0);
+}
+
+.footer-text {
+  text-align: center;
+  color: #7b68ee;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.footer-text p {
+  margin: 0;
+}
+
+.personal-color-section {
+  margin-bottom: 2rem;
+}
+
+.personal-color-card {
+  background: linear-gradient(135deg, #f8f4ff 0%, #fff0f8 100%);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  border: 2px solid #c9a9ff;
+  box-shadow: 0 8px 20px rgba(201, 169, 255, 0.2);
+}
+
+.personal-season-name {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #6b46c1;
+  margin-bottom: 1rem;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  text-shadow: 1px 1px 2px rgba(107, 70, 193, 0.2);
+}
+
+.personal-description {
+  font-size: 1.1rem;
+  color: #5b21b6;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.color-traits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.trait-item {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 15px;
+  padding: 0.8rem;
+  border: 1px solid rgba(201, 169, 255, 0.3);
+}
+
+.trait-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #8b5cf6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.3rem;
+}
+
+.trait-value {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #6b46c1;
+  text-transform: capitalize;
+}
+
+.best-colors-section,
+.avoid-colors-section {
+  margin-bottom: 2rem;
+}
+
+.color-recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.8rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.recommendation-item {
+  position: relative;
+}
+
+.recommendation-swatch {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 3px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.recommendation-swatch:hover {
+  transform: scale(1.1);
+}
+
+.avoid-swatch {
+  position: relative;
+  overflow: hidden;
+}
+
+.avoid-swatch::before {
+  content: '✖';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+  z-index: 1;
+}
+
+.avoid-swatch::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(255, 0, 0, 0.3) 50%, transparent 60%);
+  z-index: 0;
+}
+
+@keyframes rainbowFlow {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
+@media (max-width: 768px) {
+  .results {
+    padding: 1rem;
+  }
+  
+  .results-content {
+    padding: 1.5rem;
+  }
+  
+  .results-title {
+    font-size: 1.8rem;
+  }
+  
+  .color-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+  
+  .palette-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .share-button, .copy-button, .reset-button {
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .personal-color-card {
+    padding: 1.5rem;
+  }
+  
+  .personal-season-name {
+    font-size: 1.5rem;
+  }
+  
+  .personal-description {
+    font-size: 1rem;
+  }
+  
+  .color-traits {
+    grid-template-columns: 1fr;
+    max-width: 250px;
+  }
+  
+  .color-recommendation-grid {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 250px;
+  }
+}
