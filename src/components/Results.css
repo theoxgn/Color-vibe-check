@@ -1,21 +1,25 @@
 .results {
-  padding: 2rem;
-  max-width: 800px;
+  padding: 3rem 2rem;
+  max-width: 900px;
   margin: 0 auto;
 }
 
 .results-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 3rem;
 }
 
 .results-content {
-  background: linear-gradient(135deg, #fff5f8 0%, #f0f8ff 100%);
-  border-radius: 25px;
-  padding: 2rem;
-  box-shadow: 0 15px 35px rgba(255, 107, 157, 0.2);
-  border: 3px solid #ff6b9d;
+  background: 
+    linear-gradient(135deg, rgba(248, 250, 252, 0.03) 0%, rgba(120, 119, 198, 0.02) 100%);
+  backdrop-filter: blur(20px);
+  border-radius: 32px;
+  padding: 3rem;
+  box-shadow: 
+    0 20px 40px rgba(120, 119, 198, 0.1),
+    0 8px 16px rgba(255, 119, 198, 0.05);
+  border: 1px solid rgba(120, 119, 198, 0.15);
   position: relative;
   overflow: hidden;
 }
@@ -26,10 +30,10 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, #ff6b9d, #7b68ee, #4ecdc4, #ffd700, #ff6b9d);
+  height: 3px;
+  background: linear-gradient(90deg, #7877c6, #ff77c6, #a855f7, #7877c6);
   background-size: 200% 100%;
-  animation: rainbowFlow 3s linear infinite;
+  animation: rainbowFlow 4s linear infinite;
 }
 
 .results-header {

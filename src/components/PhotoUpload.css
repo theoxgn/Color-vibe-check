@@ -234,10 +234,12 @@
 }
 
 .camera-preview {
-  margin-bottom: 1.5rem;
-  border-radius: 15px;
+  margin-bottom: 2rem;
+  border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 8px 16px rgba(120, 119, 198, 0.1);
 }
 
 .camera-video {
@@ -249,52 +251,60 @@
 
 .camera-controls {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 .capture-button {
-  background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+  background: linear-gradient(135deg, #ff77c6, #a855f7);
   color: white;
   border: none;
-  padding: 1rem 2rem;
-  border-radius: 25px;
-  font-size: 1.1rem;
-  font-weight: 700;
+  padding: 1.2rem 2.5rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 15px rgba(255, 107, 157, 0.3);
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 8px 24px rgba(255, 119, 198, 0.15),
+    0 4px 8px rgba(168, 85, 247, 0.1);
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(20px);
 }
 
 .capture-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 
+    0 12px 32px rgba(255, 119, 198, 0.2),
+    0 6px 12px rgba(168, 85, 247, 0.15);
 }
 
 .cancel-button {
-  background: linear-gradient(135deg, #95a5a6, #bdc3c7);
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 25px;
-  font-size: 1.1rem;
-  font-weight: 700;
+  background: rgba(248, 250, 252, 0.1);
+  color: rgba(248, 250, 252, 0.8);
+  border: 1px solid rgba(248, 250, 252, 0.2);
+  padding: 1.2rem 2.5rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 6px 15px rgba(149, 165, 166, 0.3);
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(20px);
 }
 
 .cancel-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(149, 165, 166, 0.4);
+  transform: translateY(-3px);
+  background: rgba(248, 250, 252, 0.15);
+  box-shadow: 0 8px 24px rgba(248, 250, 252, 0.1);
 }
 
 .capture-button:active,
 .cancel-button:active {
-  transform: translateY(0);
+  transform: translateY(-1px);
 }
 
 @keyframes bounce {
