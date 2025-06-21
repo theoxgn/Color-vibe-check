@@ -58,90 +58,144 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onImageUpload }) => {
   };
 
   const startCamera = async () => {
-    // Check if we're in a secure context
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Camera not supported or HTTPS required!');
+    console.log('🎥 Starting camera...');
+    console.log('📍 Location:', window.location.href);
+    console.log('🔒 Secure context:', window.isSecureContext);
+    console.log('🌐 Protocol:', window.location.protocol);
+    
+    // Check basic support
+    if (!navigator.mediaDevices) {
+      alert('❌ Camera not supported by your browser!');
+      return;
+    }
+    
+    if (!navigator.mediaDevices.getUserMedia) {
+      alert('❌ Camera access not available. Please use HTTPS!');
       return;
     }
 
+    // Check permissions first
     try {
-      // First, try to get list of devices
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      const permission = await navigator.permissions.query({ name: 'camera' as PermissionName });
+      console.log('📷 Camera permission:', permission.state);
       
-      if (videoDevices.length === 0) {
-        alert('No camera found on your device!');
+      if (permission.state === 'denied') {
+        alert('❌ Camera permission denied. Please enable camera access in your browser settings.');
         return;
       }
+    } catch (permError) {
+      console.log('⚠️ Could not check camera permission:', permError);
+    }
 
-      // Try with simpler constraints first
-      let mediaStream;
-      try {
-        // Try back camera first (mobile)
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { 
-            facingMode: { ideal: 'environment' },
-            width: { ideal: 1280, max: 1920 },
-            height: { ideal: 720, max: 1080 }
-          }
-        });
-      } catch (backCameraError) {
+    try {
+      console.log('🔍 Getting media devices...');
+      
+      // Start with the most basic constraints
+      console.log('📱 Trying basic camera access...');
+      let mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        },
+        audio: false
+      });
+      
+      console.log('✅ Camera access granted!');
+      console.log('📺 Stream:', mediaStream);
+      console.log('🎬 Video tracks:', mediaStream.getVideoTracks());
+      
+      setStream(mediaStream);
+      setShowCamera(true);
+      
+      // Set up video element
+      if (videoRef.current) {
+        console.log('📽️ Setting up video element...');
+        videoRef.current.srcObject = mediaStream;
+        
+        // Add event listeners for debugging
+        videoRef.current.onloadstart = () => console.log('📹 Video load start');
+        videoRef.current.onloadedmetadata = () => {
+          console.log('📐 Video metadata loaded:', {
+            width: videoRef.current?.videoWidth,
+            height: videoRef.current?.videoHeight,
+            duration: videoRef.current?.duration
+          });
+        };
+        videoRef.current.oncanplay = () => console.log('▶️ Video can play');
+        videoRef.current.onplay = () => console.log('🎬 Video playing');
+        videoRef.current.onerror = (e) => console.error('❌ Video error:', e);
+        
+        // Force play
         try {
-          // Try front camera
-          mediaStream = await navigator.mediaDevices.getUserMedia({
-            video: { 
-              facingMode: { ideal: 'user' },
-              width: { ideal: 1280, max: 1920 },
-              height: { ideal: 720, max: 1080 }
+          await videoRef.current.play();
+          console.log('✅ Video playing successfully!');
+        } catch (playError) {
+          console.error('❌ Video play error:', playError);
+          // Try to play anyway
+          setTimeout(() => {
+            if (videoRef.current) {
+              videoRef.current.play().catch(e => console.log('⚠️ Delayed play failed:', e));
             }
-          });
-        } catch (frontCameraError) {
-          // Try any camera with basic constraints
-          mediaStream = await navigator.mediaDevices.getUserMedia({
-            video: true
-          });
+          }, 1000);
         }
       }
+      
+    } catch (error) {
+      console.error('❌ Camera error:', error);
+      console.error('Error details:', {
+        name: error instanceof Error ? error.name : 'Unknown',
+        message: error instanceof Error ? error.message : error,
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      
+      let errorMessage = '📷 Camera access failed!';
+      
+      if (error instanceof Error) {
+        switch (error.name) {
+          case 'NotAllowedError':
+          case 'PermissionDeniedError':
+            errorMessage = '🚫 Camera permission denied. Please:\n\n1. Click the camera icon in your browser address bar\n2. Allow camera access\n3. Refresh the page and try again';
+            break;
+          case 'NotFoundError':
+          case 'DevicesNotFoundError':
+            errorMessage = '📷 No camera found. Please check if your device has a working camera.';
+            break;
+          case 'NotSupportedError':
+            errorMessage = '⚠️ Camera not supported. Please use a modern browser with HTTPS.';
+            break;
+          case 'NotReadableError':
+            errorMessage = '🔒 Camera is busy. Please close other apps using the camera and try again.';
+            break;
+          case 'OverconstrainedError':
+            errorMessage = '⚙️ Camera settings not supported. Trying with basic settings...';
+            // Try again with minimal constraints
+            setTimeout(() => startCameraBasic(), 1000);
+            return;
+          default:
+            errorMessage = `❌ Camera error: ${error.message}`;
+        }
+      }
+      
+      alert(errorMessage);
+    }
+  };
+  
+  // Fallback function with minimal constraints
+  const startCameraBasic = async () => {
+    try {
+      console.log('🔄 Trying basic camera...');
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
       
       setStream(mediaStream);
       setShowCamera(true);
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-        // Wait for video to be ready
-        await new Promise((resolve) => {
-          if (videoRef.current) {
-            videoRef.current.onloadedmetadata = () => resolve(true);
-          }
-        });
-        await videoRef.current.play();
+        videoRef.current.play().catch(e => console.log('Basic play error:', e));
       }
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-      let errorMessage = 'Camera access failed. ';
-      
-      if (error instanceof Error) {
-        switch (error.name) {
-          case 'NotAllowedError':
-          case 'PermissionDeniedError':
-            errorMessage += 'Please allow camera permissions in your browser settings.';
-            break;
-          case 'NotFoundError':
-          case 'DevicesNotFoundError':
-            errorMessage += 'No camera found on your device.';
-            break;
-          case 'NotSupportedError':
-            errorMessage += 'Camera not supported. Make sure you\'re using HTTPS.';
-            break;
-          case 'NotReadableError':
-            errorMessage += 'Camera is being used by another application.';
-            break;
-          default:
-            errorMessage += 'Please check your camera permissions and try again.';
-        }
-      }
-      
-      alert(errorMessage);
+    } catch (basicError) {
+      console.error('❌ Basic camera also failed:', basicError);
+      alert('❌ Could not access camera with any settings. Please check your browser permissions.');
     }
   };
 
@@ -247,8 +301,17 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onImageUpload }) => {
             <button 
               className="camera-button"
               onClick={startCamera}
+              style={{position: 'relative'}}
             >
               📷 Take Photo
+              <div style={{
+                fontSize: '0.7rem', 
+                marginTop: '0.3rem', 
+                opacity: 0.8,
+                fontWeight: 'normal'
+              }}>
+                {window.isSecureContext ? '🔒 Secure' : '⚠️ Needs HTTPS'}
+              </div>
             </button>
             <p className="camera-text">or snap a fresh pic! 📱</p>
           </div>
@@ -292,9 +355,11 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onImageUpload }) => {
           </div>
           
           <div className="camera-status">
-            <p style={{fontSize: '0.8rem', color: '#666', textAlign: 'center'}}>
-              {stream ? `Camera active` : 'Camera inactive'} | 
-              {videoRef.current ? ` Video: ${videoRef.current.videoWidth || 0}x${videoRef.current.videoHeight || 0}` : ' No video'}
+            <p style={{fontSize: '0.8rem', color: 'rgba(248, 250, 252, 0.6)', textAlign: 'center', marginBottom: '1rem'}}>
+              Status: {stream ? '🟢 Active' : '🔴 Inactive'} | 
+              Resolution: {videoRef.current ? `${videoRef.current.videoWidth || 0}x${videoRef.current.videoHeight || 0}` : 'Loading...'} |
+              Protocol: {window.location.protocol} |
+              Secure: {window.isSecureContext ? '🔒 Yes' : '⚠️ No'}
             </p>
           </div>
 
