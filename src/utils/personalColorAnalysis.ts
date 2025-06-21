@@ -143,9 +143,14 @@ const SEASON_DATA: Record<string, SeasonData> = {
 };
 
 export function analyzePersonalColor(imageData: ImageData): PersonalColorAnalysis {
+  console.log('Starting personal color analysis...');
+  console.log('Image dimensions:', imageData.width, 'x', imageData.height);
+  
   const features = extractColorFeatures(imageData);
   const season = determineSeason(features);
   const seasonData = SEASON_DATA[season];
+  
+  console.log('Final season determined:', season);
 
   return {
     season: seasonData.name,
@@ -185,82 +190,137 @@ function extractColorFeatures(imageData: ImageData): ColorFeatures {
 }
 
 function analyzeSkinRegion(pixels: Uint8ClampedArray, width: number, height: number) {
-  // Analyze center region of image (likely face area)
-  const centerX = Math.floor(width / 2);
-  const centerY = Math.floor(height / 2);
-  const regionSize = Math.min(width, height) / 4;
-
   const colors: number[][] = [];
+  
+  // Sample multiple regions for better skin detection
+  const regions = [
+    { x: 0.3, y: 0.3, size: 0.2 }, // Upper left face
+    { x: 0.7, y: 0.3, size: 0.2 }, // Upper right face  
+    { x: 0.5, y: 0.5, size: 0.3 }, // Center face
+    { x: 0.5, y: 0.7, size: 0.2 }, // Lower face
+  ];
 
-  for (let y = centerY - regionSize / 2; y < centerY + regionSize / 2; y += 2) {
-    for (let x = centerX - regionSize / 2; x < centerX + regionSize / 2; x += 2) {
-      if (y >= 0 && y < height && x >= 0 && x < width) {
-        const index = (y * width + x) * 4;
-        const r = pixels[index];
-        const g = pixels[index + 1];
-        const b = pixels[index + 2];
-        
-        // Filter for skin-like colors
-        if (isSkinColor(r, g, b)) {
-          colors.push([r, g, b]);
+  regions.forEach(region => {
+    const startX = Math.floor(width * region.x - (width * region.size) / 2);
+    const endX = Math.floor(width * region.x + (width * region.size) / 2);
+    const startY = Math.floor(height * region.y - (height * region.size) / 2);
+    const endY = Math.floor(height * region.y + (height * region.size) / 2);
+
+    for (let y = startY; y < endY; y += 3) {
+      for (let x = startX; x < endX; x += 3) {
+        if (y >= 0 && y < height && x >= 0 && x < width) {
+          const index = (y * width + x) * 4;
+          const r = pixels[index];
+          const g = pixels[index + 1];
+          const b = pixels[index + 2];
+          const a = pixels[index + 3];
+          
+          if (a > 200 && isSkinColor(r, g, b)) {
+            colors.push([r, g, b]);
+          }
         }
       }
     }
-  }
+  });
 
-  return colors.length > 0 ? colors : [[200, 180, 160]]; // Default fallback
+  console.log('Skin colors found:', colors.length);
+  return colors.length > 20 ? colors : [[220, 180, 140], [200, 160, 120], [180, 140, 100]];
 }
 
 function analyzeEyeRegion(pixels: Uint8ClampedArray, width: number, height: number) {
-  // Analyze upper center region (likely eye area)
-  const centerX = Math.floor(width / 2);
-  const eyeY = Math.floor(height * 0.4);
-  const regionSize = Math.min(width, height) / 8;
-
   const colors: number[][] = [];
+  
+  // Sample eye regions (left and right)
+  const eyeRegions = [
+    { x: 0.35, y: 0.35, size: 0.08 }, // Left eye
+    { x: 0.65, y: 0.35, size: 0.08 }, // Right eye
+  ];
 
-  for (let y = eyeY - regionSize / 2; y < eyeY + regionSize / 2; y++) {
-    for (let x = centerX - regionSize; x < centerX + regionSize; x++) {
-      if (y >= 0 && y < height && x >= 0 && x < width) {
-        const index = (y * width + x) * 4;
-        const r = pixels[index];
-        const g = pixels[index + 1];
-        const b = pixels[index + 2];
-        colors.push([r, g, b]);
+  eyeRegions.forEach(region => {
+    const startX = Math.floor(width * region.x - (width * region.size) / 2);
+    const endX = Math.floor(width * region.x + (width * region.size) / 2);
+    const startY = Math.floor(height * region.y - (height * region.size) / 2);
+    const endY = Math.floor(height * region.y + (height * region.size) / 2);
+
+    for (let y = startY; y < endY; y += 2) {
+      for (let x = startX; x < endX; x += 2) {
+        if (y >= 0 && y < height && x >= 0 && x < width) {
+          const index = (y * width + x) * 4;
+          const r = pixels[index];
+          const g = pixels[index + 1];
+          const b = pixels[index + 2];
+          const a = pixels[index + 3];
+          
+          if (a > 200) {
+            colors.push([r, g, b]);
+          }
+        }
       }
     }
-  }
+  });
 
-  return colors.length > 0 ? colors : [[100, 80, 60]]; // Default fallback
+  console.log('Eye colors found:', colors.length);
+  return colors.length > 10 ? colors : [[80, 60, 40], [120, 100, 80]];
 }
 
 function analyzeHairRegion(pixels: Uint8ClampedArray, width: number, height: number) {
-  // Analyze top region (likely hair area)
-  const regionHeight = Math.floor(height * 0.3);
   const colors: number[][] = [];
+  
+  // Sample top and side regions for hair
+  const hairRegions = [
+    { x: 0.2, y: 0.15, size: 0.15 }, // Top left
+    { x: 0.5, y: 0.1, size: 0.2 },  // Top center
+    { x: 0.8, y: 0.15, size: 0.15 }, // Top right
+    { x: 0.1, y: 0.4, size: 0.1 },  // Left side
+    { x: 0.9, y: 0.4, size: 0.1 },  // Right side
+  ];
 
-  for (let y = 0; y < regionHeight; y += 2) {
-    for (let x = 0; x < width; x += 2) {
-      const index = (y * width + x) * 4;
-      const r = pixels[index];
-      const g = pixels[index + 1];
-      const b = pixels[index + 2];
-      colors.push([r, g, b]);
+  hairRegions.forEach(region => {
+    const startX = Math.floor(width * region.x - (width * region.size) / 2);
+    const endX = Math.floor(width * region.x + (width * region.size) / 2);
+    const startY = Math.floor(height * region.y - (height * region.size) / 2);
+    const endY = Math.floor(height * region.y + (height * region.size) / 2);
+
+    for (let y = startY; y < endY; y += 3) {
+      for (let x = startX; x < endX; x += 3) {
+        if (y >= 0 && y < height && x >= 0 && x < width) {
+          const index = (y * width + x) * 4;
+          const r = pixels[index];
+          const g = pixels[index + 1];
+          const b = pixels[index + 2];
+          const a = pixels[index + 3];
+          
+          if (a > 200) {
+            colors.push([r, g, b]);
+          }
+        }
+      }
     }
-  }
+  });
 
-  return colors.length > 0 ? colors : [[80, 60, 40]]; // Default fallback
+  console.log('Hair colors found:', colors.length);
+  return colors.length > 10 ? colors : [[60, 40, 20], [100, 80, 60]];
 }
 
 function isSkinColor(r: number, g: number, b: number): boolean {
-  // Basic skin color detection
-  return (
-    r > 95 && g > 40 && b > 20 &&
-    r > g && r > b &&
-    Math.abs(r - g) > 15 &&
-    (r - g) > 15 &&
-    (r - b) > 15
+  // Improved skin color detection with wider range
+  const brightness = (r + g + b) / 3;
+  
+  // Basic skin tone range
+  if (brightness < 50 || brightness > 250) return false;
+  
+  // Skin typically has red > green > blue, but allow variations
+  const redDominance = r >= g * 0.8 && r >= b * 0.9;
+  const yellowishness = (r + g) / 2 > b * 1.1;
+  
+  // Check for typical skin color ratios
+  const isFleshTone = (
+    (r > 80 && g > 50 && b > 30) && // Minimum values
+    (r <= 255 && g <= 220 && b <= 200) && // Maximum values
+    (redDominance || yellowishness) // Color characteristics
   );
+  
+  return isFleshTone;
 }
 
 function determineUndertone(skinColors: number[][]): 'warm' | 'cool' {
@@ -268,25 +328,35 @@ function determineUndertone(skinColors: number[][]): 'warm' | 'cool' {
 
   let warmScore = 0;
   let coolScore = 0;
+  let totalPixels = 0;
 
   skinColors.forEach(([r, g, b]) => {
-    // Warm undertones tend to have more yellow/golden tones
-    const yellowishness = (r + g) / 2 - b;
-    const pinkishness = (r + b) / 2 - g;
-
-    if (yellowishness > pinkishness) {
-      warmScore++;
-    } else {
-      coolScore++;
-    }
-
-    // Additional warm indicators
-    if (r > g && g > b) warmScore += 0.5;
-    // Additional cool indicators  
-    if (b > 100 || (r + b) / 2 > g) coolScore += 0.5;
+    totalPixels++;
+    
+    // Calculate color temperature indicators
+    const yellowness = (r + g) / 2 - b; // Higher = more yellow (warm)
+    const pinkness = (r + b) / 2 - g;   // Higher = more pink (cool)
+    const greenness = g - (r + b) / 2;  // Higher = more green (cool)
+    
+    // Warm undertone indicators
+    if (yellowness > 10) warmScore += 2;
+    if (r > g + 5 && g > b + 5) warmScore += 1; // Red > Green > Blue
+    if ((r + g) > b * 2.2) warmScore += 1; // Golden ratio
+    
+    // Cool undertone indicators  
+    if (pinkness > 10) coolScore += 2;
+    if (greenness > 5) coolScore += 1;
+    if (b > r * 0.8) coolScore += 1; // More blue
+    if (r > 200 && g > 150 && b > 150) coolScore += 1; // Pink tones
   });
 
-  return warmScore > coolScore ? 'warm' : 'cool';
+  // Normalize scores
+  const warmRatio = warmScore / totalPixels;
+  const coolRatio = coolScore / totalPixels;
+  
+  console.log(`Undertone analysis: Warm=${warmRatio.toFixed(2)}, Cool=${coolRatio.toFixed(2)}`);
+  
+  return warmRatio > coolRatio ? 'warm' : 'cool';
 }
 
 function determineSkinTone(skinColors: number[][]): 'light' | 'medium' | 'dark' {
@@ -296,83 +366,140 @@ function determineSkinTone(skinColors: number[][]): 'light' | 'medium' | 'dark' 
     return sum + (r + g + b) / 3;
   }, 0) / skinColors.length;
 
-  if (avgBrightness > 180) return 'light';
-  if (avgBrightness > 120) return 'medium';
+  console.log(`Skin tone brightness: ${avgBrightness.toFixed(1)}`);
+
+  if (avgBrightness > 190) return 'light';
+  if (avgBrightness > 140) return 'medium';
   return 'dark';
 }
 
 function determineEyeColor(eyeColors: number[][]): 'light' | 'dark' {
   if (eyeColors.length === 0) return 'dark';
 
-  const avgBrightness = eyeColors.reduce((sum, [r, g, b]) => {
+  // Sort colors by brightness and take darker ones (likely iris)
+  const sortedColors = eyeColors.sort((a, b) => {
+    const brightnessA = (a[0] + a[1] + a[2]) / 3;
+    const brightnessB = (b[0] + b[1] + b[2]) / 3;
+    return brightnessA - brightnessB;
+  });
+  
+  // Take bottom 30% as likely eye color (avoiding white/bright areas)
+  const eyeColorSample = sortedColors.slice(0, Math.floor(sortedColors.length * 0.3));
+  
+  const avgBrightness = eyeColorSample.reduce((sum, [r, g, b]) => {
     return sum + (r + g + b) / 3;
-  }, 0) / eyeColors.length;
+  }, 0) / eyeColorSample.length;
 
-  return avgBrightness > 100 ? 'light' : 'dark';
+  console.log(`Eye color brightness: ${avgBrightness.toFixed(1)}`);
+  
+  return avgBrightness > 90 ? 'light' : 'dark';
 }
 
 function determineHairColor(hairColors: number[][]): 'light' | 'dark' {
   if (hairColors.length === 0) return 'dark';
 
-  const avgBrightness = hairColors.reduce((sum, [r, g, b]) => {
-    return sum + (r + g + b) / 3;
-  }, 0) / hairColors.length;
+  // Filter out very bright colors (likely background/skin)
+  const filteredColors = hairColors.filter(([r, g, b]) => {
+    const brightness = (r + g + b) / 3;
+    return brightness < 200; // Remove very bright pixels
+  });
+  
+  if (filteredColors.length === 0) return 'dark';
 
-  return avgBrightness > 80 ? 'light' : 'dark';
+  const avgBrightness = filteredColors.reduce((sum, [r, g, b]) => {
+    return sum + (r + g + b) / 3;
+  }, 0) / filteredColors.length;
+
+  console.log(`Hair color brightness: ${avgBrightness.toFixed(1)}`);
+  
+  return avgBrightness > 100 ? 'light' : 'dark';
 }
 
 function determineChroma(skinColors: number[][], eyeColors: number[][], hairColors: number[][]): 'clear' | 'muted' {
-  // Calculate overall contrast and saturation
-  const allColors = [...skinColors, ...eyeColors, ...hairColors];
+  if (skinColors.length === 0 || eyeColors.length === 0 || hairColors.length === 0) {
+    return 'clear';
+  }
+
+  // Calculate average colors for each region
+  const avgSkin = getAverageColor(skinColors);
+  const avgEye = getAverageColor(eyeColors.slice(0, Math.floor(eyeColors.length * 0.3))); // Darker eye colors
+  const avgHair = getAverageColor(hairColors.filter(([r, g, b]) => (r + g + b) / 3 < 200));
+
+  // Calculate contrast between features
+  const skinEyeContrast = getColorDistance(avgSkin, avgEye);
+  const skinHairContrast = getColorDistance(avgSkin, avgHair);
+  const eyeHairContrast = getColorDistance(avgEye, avgHair);
   
-  if (allColors.length === 0) return 'clear';
+  const avgContrast = (skinEyeContrast + skinHairContrast + eyeHairContrast) / 3;
+  
+  // Calculate saturation
+  const allColors = [avgSkin, avgEye, avgHair];
+  const avgSaturation = allColors.reduce((sum, [r, g, b]) => {
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const saturation = max === 0 ? 0 : (max - min) / max;
+    return sum + saturation;
+  }, 0) / allColors.length;
+  
+  console.log(`Contrast: ${avgContrast.toFixed(1)}, Saturation: ${avgSaturation.toFixed(2)}`);
+  
+  // High contrast and saturation = clear, low = muted
+  return (avgContrast > 80 || avgSaturation > 0.3) ? 'clear' : 'muted';
+}
 
-  let totalContrast = 0;
-  let contrastCount = 0;
+function getAverageColor(colors: number[][]): number[] {
+  if (colors.length === 0) return [128, 128, 128];
+  
+  const sum = colors.reduce((acc, [r, g, b]) => {
+    acc[0] += r;
+    acc[1] += g;
+    acc[2] += b;
+    return acc;
+  }, [0, 0, 0]);
+  
+  return [sum[0] / colors.length, sum[1] / colors.length, sum[2] / colors.length];
+}
 
-  // Calculate contrast between different regions
-  skinColors.forEach(skinColor => {
-    eyeColors.forEach(eyeColor => {
-      const contrast = Math.abs(
-        (skinColor[0] + skinColor[1] + skinColor[2]) / 3 -
-        (eyeColor[0] + eyeColor[1] + eyeColor[2]) / 3
-      );
-      totalContrast += contrast;
-      contrastCount++;
-    });
-  });
-
-  const avgContrast = contrastCount > 0 ? totalContrast / contrastCount : 50;
-
-  return avgContrast > 60 ? 'clear' : 'muted';
+function getColorDistance(color1: number[], color2: number[]): number {
+  return Math.sqrt(
+    Math.pow(color1[0] - color2[0], 2) +
+    Math.pow(color1[1] - color2[1], 2) +
+    Math.pow(color1[2] - color2[2], 2)
+  );
 }
 
 function determineSeason(features: ColorFeatures): string {
   const { undertone, skinTone, eyeColor, hairColor, chroma } = features;
+  
+  console.log('Features:', features);
 
   if (undertone === 'warm') {
-    if (skinTone === 'light' && hairColor === 'light') {
-      if (chroma === 'clear') return 'Light Spring';
-      else return 'Warm Spring';
-    } else if (hairColor === 'dark' || eyeColor === 'dark') {
+    if (skinTone === 'light') {
+      if (hairColor === 'light' && chroma === 'clear') return 'Light Spring';
+      if (hairColor === 'light') return 'Warm Spring';
       if (chroma === 'clear') return 'Bright Spring';
-      else return 'Warm Autumn';
-    } else {
+      return 'Warm Spring';
+    } else if (skinTone === 'medium') {
+      if (chroma === 'clear' && (hairColor === 'dark' || eyeColor === 'dark')) return 'Bright Spring';
+      if (chroma === 'clear') return 'Warm Spring';
       return 'Soft Autumn';
+    } else { // dark skin
+      if (chroma === 'clear') return 'Deep Autumn';
+      return 'Warm Autumn';
     }
-  }
-
-  if (undertone === 'cool') {
-    if (skinTone === 'light' && hairColor === 'light') {
-      if (chroma === 'muted') return 'Soft Summer';
-      else return 'Light Summer';
-    } else if (hairColor === 'dark' || eyeColor === 'dark') {
-      if (chroma === 'clear') return 'Bright Winter';
-      else return 'Deep Winter';
-    } else {
+  } else { // cool undertone
+    if (skinTone === 'light') {
+      if (hairColor === 'light' && chroma === 'muted') return 'Light Summer';
+      if (hairColor === 'light') return 'Soft Summer';
+      if (chroma === 'clear') return 'Cool Summer';
+      return 'Light Summer';
+    } else if (skinTone === 'medium') {
+      if (chroma === 'clear' && (hairColor === 'dark' || eyeColor === 'dark')) return 'Bright Winter';
+      if (chroma === 'clear') return 'Cool Summer';
       return 'Soft Summer';
+    } else { // dark skin
+      if (chroma === 'clear') return 'Deep Winter';
+      return 'Cool Winter';
     }
   }
-
-  return 'Soft Autumn'; // Default fallback
 }
