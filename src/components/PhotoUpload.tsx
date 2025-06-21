@@ -120,9 +120,19 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onImageUpload }) => {
             height: videoRef.current?.videoHeight,
             duration: videoRef.current?.duration
           });
+          // Force re-render to update resolution display
+          setStream(mediaStream);
         };
-        videoRef.current.oncanplay = () => console.log('▶️ Video can play');
-        videoRef.current.onplay = () => console.log('🎬 Video playing');
+        videoRef.current.oncanplay = () => {
+          console.log('▶️ Video can play');
+          // Force re-render when video is ready
+          setStream(mediaStream);
+        };
+        videoRef.current.onplay = () => {
+          console.log('🎬 Video playing');
+          // Force re-render when playing
+          setStream(mediaStream);
+        };
         videoRef.current.onerror = (e) => console.error('❌ Video error:', e);
         
         // Force play
@@ -211,17 +221,25 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onImageUpload }) => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     
-    console.log('Capture photo called');
-    console.log('Video element:', video);
-    console.log('Canvas element:', canvas);
+    console.log('📸 Capture photo called');
+    console.log('📹 Video element:', video);
+    console.log('🎨 Canvas element:', canvas);
+    console.log('📐 Video dimensions:', video?.videoWidth, 'x', video?.videoHeight);
+    console.log('🎥 Video ready state:', video?.readyState);
+    console.log('⏰ Video current time:', video?.currentTime);
     
     if (!video || !canvas) {
-      alert('Camera not ready. Please try again! 📷');
+      alert('📷 Camera not ready. Please try again!');
       return;
     }
 
     if (video.videoWidth === 0 || video.videoHeight === 0) {
-      alert('Camera is still loading. Please wait a moment and try again! ⏳');
+      alert('⏳ Camera is still loading. Please wait a moment and try again!\\n\\nTip: Try refreshing the page if this persists.');
+      return;
+    }
+    
+    if (video.readyState < 2) {
+      alert('📱 Video not ready yet. Please wait a few seconds and try again.');
       return;
     }
     
@@ -357,10 +375,15 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onImageUpload }) => {
           <div className="camera-status">
             <p style={{fontSize: '0.8rem', color: 'rgba(248, 250, 252, 0.6)', textAlign: 'center', marginBottom: '1rem'}}>
               Status: {stream ? '🟢 Active' : '🔴 Inactive'} | 
-              Resolution: {videoRef.current ? `${videoRef.current.videoWidth || 0}x${videoRef.current.videoHeight || 0}` : 'Loading...'} |
+              Resolution: {videoRef.current && videoRef.current.videoWidth > 0 ? `${videoRef.current.videoWidth}x${videoRef.current.videoHeight}` : 'Loading...'} |
               Protocol: {window.location.protocol} |
               Secure: {window.isSecureContext ? '🔒 Yes' : '⚠️ No'}
             </p>
+            {stream && videoRef.current && videoRef.current.videoWidth === 0 && (
+              <p style={{fontSize: '0.7rem', color: 'orange', textAlign: 'center', marginBottom: '1rem'}}>
+                📱 Video loading... If this persists, try refreshing the page or check camera permissions.
+              </p>
+            )}
           </div>
 
           <div className="camera-controls">
