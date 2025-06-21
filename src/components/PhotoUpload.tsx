@@ -135,10 +135,28 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onImageUpload }) => {
         };
         videoRef.current.onerror = (e) => console.error('❌ Video error:', e);
         
+        // Wait for metadata before playing
+        const waitForMetadata = new Promise((resolve) => {
+          if (videoRef.current!.videoWidth > 0) {
+            resolve(true);
+          } else {
+            videoRef.current!.addEventListener('loadedmetadata', () => resolve(true), { once: true });
+          }
+        });
+        
         // Force play
         try {
           await videoRef.current.play();
           console.log('✅ Video playing successfully!');
+          
+          // Wait for metadata with timeout
+          const metadataTimeout = setTimeout(() => {
+            console.log('⚠️ Metadata timeout, but continuing...');
+          }, 3000);
+          
+          await Promise.race([waitForMetadata, new Promise(resolve => setTimeout(resolve, 3000))]);
+          clearTimeout(metadataTimeout);
+          
         } catch (playError) {
           console.error('❌ Video play error:', playError);
           // Try to play anyway
@@ -362,9 +380,25 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ onImageUpload }) => {
               playsInline
               muted
               className="camera-video"
-              onLoadedMetadata={() => console.log('Video metadata loaded')}
-              onCanPlay={() => console.log('Video can play')}
-              onError={(e) => console.error('Video error:', e)}
+              style={{
+                width: '100%',
+                height: 'auto',
+                minHeight: '200px',
+                backgroundColor: '#000'
+              }}
+              onLoadedMetadata={(e) => {
+                console.log('📐 Video metadata loaded from video element');
+                const video = e.target as HTMLVideoElement;
+                console.log('📏 Dimensions:', video.videoWidth, 'x', video.videoHeight);
+              }}
+              onCanPlay={() => console.log('▶️ Video can play from video element')}
+              onError={(e) => console.error('❌ Video error from video element:', e)}
+              onTimeUpdate={() => {
+                if (videoRef.current && videoRef.current.videoWidth > 0) {
+                  // Force update when we have dimensions
+                  setStream(current => current);
+                }
+              }}
             />
             <canvas
               ref={canvasRef}
